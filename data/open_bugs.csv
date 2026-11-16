@@ -1,0 +1,17 @@
+bug_id,release_id,title,severity,status,owner,area
+B-1001,R-401,Promo code can be applied more than the allowed limit,High,Open,Priya,promo
+B-1002,R-401,Typo on the payment screen,Low,Open,Sam,payment
+B-1003,R-401,App crashes when an old coupon is used,Critical,Closed,Priya,promo
+B-1010,R-402,App crashes on startup on Android 12,Critical,Fixed-verified,Marco,startup
+B-1020,R-403,Search is slow for very long queries,High,Open,Lena,indexing
+B-1021,R-403,Filter chip is misaligned on small screens,Low,Open,Tom,filters
+B-1022,R-403,Ranking ignores recency in an edge case,High,In progress,Lena,ranking
+B-1023,R-403,Autocomplete list flickers,Low,Open,Tom,indexing
+B-1040,R-405,Refund is posted twice when the request is retried,Critical,In progress,Aisha,refunds
+B-1041,R-405,Invoice footer uses the wrong font,Low,Open,Noor,invoices
+B-1042,R-405,Tax line rounds down on one currency,Medium,Open,Noor,tax
+B-1050,R-406,Notification badge count is off by one,Low,Open,Jin,push
+B-1060,R-407,Export to CSV drops the last row,High,Open,Dev,export
+B-1061,R-407,Chart legend overlaps on narrow screens,High,In progress,Dev,charts
+B-1062,R-407,Slow load on reports with 50+ filters,Medium,Open,Mia,filters
+B-1070,R-408,Sign-in page shows the old logo,Medium,Open,Omar,login

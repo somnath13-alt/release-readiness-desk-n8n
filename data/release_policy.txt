@@ -1,0 +1,35 @@
+RELEASE POLICY
+==============
+
+Use these rules to judge every release. A bug counts as OPEN if its status is "Open" or "In progress".
+Bugs with status "Fixed-verified" or "Closed" do not count. Only count bugs that belong to the release being checked.
+
+RULES BY RELEASE TYPE
+
+                              hotfix        minor         major
+  Test pass rate (at least)   95%           97%           98%
+  Tests run in total (at least)  none       none          400
+  Open Critical bugs (max)    0             0             0
+  Open High bugs (max)        0             2             2
+  Blocked dependency          not checked   not allowed   not allowed
+  At risk dependency          not checked   condition     condition
+
+Test pass rate = total tests passed / total tests run, across all areas of the release.
+
+HOW TO DECIDE
+
+NO-GO
+  Any rule above is broken. Name every broken rule in the memo.
+
+GO WITH CONDITIONS
+  No rule is broken, but there are open High bugs (within the limit) or an At risk dependency.
+  List each one as a condition that must be resolved or accepted before shipping.
+
+GO
+  No rule is broken, no open High bugs, and no At risk dependencies.
+
+THE MEMO MUST
+  - Start with the release name and one of: GO, GO WITH CONDITIONS, NO-GO.
+  - Give the reasons, each one tied to a rule or a number from the data.
+  - For GO WITH CONDITIONS, list the conditions and who owns them.
+  - For NO-GO, list what must change for the release to become GO.

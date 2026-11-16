@@ -1,0 +1,1899 @@
+{
+  "name": "Release Readiness Deck",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "id": "571ef5f0-44e5-46a7-b4d4-a07dcefd8bff",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -768,
+        16
+      ],
+      "webhookId": "14a9fd2a-dee9-43a9-a410-ac7673902a30"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads the list of all releases with release_id, name and type.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 404008478,
+          "mode": "list",
+          "cachedResultName": "releases",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=404008478"
+        },
+        "options": {}
+      },
+      "id": "b758f136-bf24-4cd6-a8f3-2627a4880746",
+      "name": "Releases sheet",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -528,
+        208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Tests Checker for a HOTFIX release.\nUse the Google Sheets tool to read the test_results rows for the given release_id.\nUse only rows for that release. Never guess.\n\nPolicy for a hotfix release: pass rate at least 95%. There is NO minimum on tests run,\nso min_tests_rule_met is always true.\nPass rate = total tests passed / total tests run, across ALL areas\n(not an average of the per-area percentages). Round to 1 decimal.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\", \"areas\": [{\"area\": \"...\", \"run\": 0, \"passed\": 0}],\n \"total_run\": 0, \"total_passed\": 0, \"pass_rate_percent\": 0.0,\n \"pass_rate_rule_met\": true, \"min_tests_rule_met\": true,\n \"summary\": \"one sentence\"}"
+        }
+      },
+      "id": "4a2d5c19-70e1-440e-86b8-894c7d5cd946",
+      "name": "Test Checker (hotfix)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        -512
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "ca562038-b8da-448c-8202-a632a7fde42f",
+      "name": "OpenRouter Chat Model10",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -272
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads test results (release_id, area, tests_run, tests_passed). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1392940621,
+          "mode": "list",
+          "cachedResultName": "test_results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=1392940621"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9bedd719-851a-461e-8e6c-a764418d05e3",
+      "name": "Test Result Sheet2",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        -304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Bugs Checker for a HOTFIX release.\nUse the Google Sheets tool to read the open_bugs rows for the given release_id.\nUse only rows for that release. Never guess.\n\nA bug is OPEN only if its status is exactly \"Open\" or \"In progress\".\n\"Closed\" and \"Fixed-verified\" do NOT count.\n\nPolicy for a hotfix release: open Critical at most 0, open High at most 0. List ALL open bugs of ANY severity.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\",\n \"open_bugs\": [{\"bug_id\": \"...\", \"severity\": \"...\", \"status\": \"...\", \"owner\": \"...\"}],\n \"open_critical\": 0, \"open_high\": 0,\n \"critical_rule_met\": true, \"high_rule_met\": true,\n \"summary\": \"one sentence\"}\n\nList ALL open bugs of ANY severity (Critical, High, Medium, Low). Never omit one."
+        }
+      },
+      "id": "8a15d341-dcba-411e-89f7-dfe6f211f7dd",
+      "name": "Bug Checker (hotfix)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        368,
+        -352
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "22a70ed8-082d-4d32-816e-c1591863c34e",
+      "name": "OpenRouter Chat Model11",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        256,
+        -208
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads bugs (bug_id, release_id, title, severity, status, owner). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 73704029,
+          "mode": "list",
+          "cachedResultName": "open_bugs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=73704029"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ce67ab77-9881-4533-8e3d-674a531a319c",
+      "name": "Open Bugs Sheet2",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        752,
+        -192
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Tests Checker for a MINOR release.\nUse the Google Sheets tool to read the test_results rows for the given release_id.\nUse only rows for that release. Never guess.\n\nPolicy for a minor release: pass rate at least 97%, and no minimum on tests run. min_tests_rule_met is always true.\nPass rate = total tests passed / total tests run, across ALL areas\n(not an average of the per-area percentages). Round to 1 decimal.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\", \"areas\": [{\"area\": \"...\", \"run\": 0, \"passed\": 0}],\n \"total_run\": 0, \"total_passed\": 0, \"pass_rate_percent\": 0.0,\n \"pass_rate_rule_met\": true, \"min_tests_rule_met\": true,\n \"summary\": \"one sentence\"}"
+        }
+      },
+      "id": "24f41ed6-38e1-47b0-b409-5e62161ebef9",
+      "name": "Test Checker (minor)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        432,
+        -192
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "8c78b639-dc64-4ba2-8688-182ea8774f74",
+      "name": "OpenRouter Chat Model7",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -80
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads test results (release_id, area, tests_run, tests_passed). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1392940621,
+          "mode": "list",
+          "cachedResultName": "test_results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=1392940621"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6f8dfbba-f593-4d16-b8a2-28c578032690",
+      "name": "Test Result Sheet1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        -96
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Bugs Checker for a MINOR release.\nUse the Google Sheets tool to read the open_bugs rows for the given release_id.\nUse only rows for that release. Never guess.\n\nA bug is OPEN only if its status is exactly \"Open\" or \"In progress\".\n\"Closed\" and \"Fixed-verified\" do NOT count.\n\nPolicy for a minor release: open Critical at most 0, open High at most 2. List ALL open bugs of ANY severity. Never omit one.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\",\n \"open_bugs\": [{\"bug_id\": \"...\", \"severity\": \"...\", \"status\": \"...\", \"owner\": \"...\"}],\n \"open_critical\": 0, \"open_high\": 0,\n \"critical_rule_met\": true, \"high_rule_met\": true,\n \"summary\": \"one sentence\"}\n\nList ALL open bugs of ANY severity (Critical, High, Medium, Low). Never omit one."
+        }
+      },
+      "id": "f324ba43-365f-4a89-b97d-6766cc804213",
+      "name": "Bug Checker (minor)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "023dd4f2-245c-41e3-8246-1de56fbe8bd1",
+      "name": "OpenRouter Chat Model8",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        96
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads bugs (bug_id, release_id, title, severity, status, owner). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 73704029,
+          "mode": "list",
+          "cachedResultName": "open_bugs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=73704029"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8149b78a-61f8-4269-9a53-8288c2ccb2d9",
+      "name": "Open Bugs Sheet1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        144
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Dependencies Checker for a MINOR release.\nUse the Google Sheets tool to read the dependencies rows for the given release_id.\nUse only rows for that release. Never guess.\n\nPolicy for a minor release: Blocked not allowed, At risk becomes a condition.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\",\n \"dependencies\": [{\"dep_id\": \"...\", \"team\": \"...\", \"status\": \"...\", \"due_date\": \"...\"}],\n \"blocked_count\": 0, \"at_risk_count\": 0,\n \"blocked_rule_met\": true,\n \"summary\": \"one sentence\"}"
+        }
+      },
+      "id": "b02962f4-d753-44a5-9cc1-d82045b02fcf",
+      "name": "Dependency Checker (minor)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "6fcbb4d3-8702-4f5e-b99e-681a850b7a52",
+      "name": "OpenRouter Chat Model9",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        320,
+        272
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads dependencies (dep_id, release_id, depends_on_team, description, status, due_date). Filter by release_id",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1639149299,
+          "mode": "list",
+          "cachedResultName": "dependencies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=1639149299"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "62da6026-94b3-42d8-a157-737dd5e19a37",
+      "name": "Dependencies Sheet1",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        288
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "dee14fd5-9196-45e3-a32c-5535a578d99f",
+      "name": "OpenRouter Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        336,
+        416
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads test results (release_id, area, tests_run, tests_passed). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1392940621,
+          "mode": "list",
+          "cachedResultName": "test_results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=1392940621"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "67efd152-9efe-4692-8836-1a75dd8ee560",
+      "name": "Test Result Sheet",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        432
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "fdac1cb6-a263-4408-b17c-bd1c519a1fc9",
+      "name": "OpenRouter Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        336,
+        608
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads bugs (bug_id, release_id, title, severity, status, owner). Filter by release_id.",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 73704029,
+          "mode": "list",
+          "cachedResultName": "open_bugs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=73704029"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2d881d33-73e8-4de9-90ca-944511b192ea",
+      "name": "Open Bugs Sheet",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        592,
+        624
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "182cf83b-4ee7-4b9d-aed7-8c0a8167dac2",
+      "name": "OpenRouter Chat Model3",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        352,
+        848
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Reads dependencies (dep_id, release_id, depends_on_team, description, status, due_date). Filter by release_id",
+        "documentId": {
+          "__rl": true,
+          "value": "1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk",
+          "mode": "list",
+          "cachedResultName": "Release Readiness Deck",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1639149299,
+          "mode": "list",
+          "cachedResultName": "dependencies",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGBms3GY1DcSWK_5MpcTzrO2hO2Yii_qtn4U1gUn3zk/edit#gid=1639149299"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "release_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b3bbf7f6-ce29-4123-9a42-0ad182797193",
+      "name": "Dependencies Sheet",
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        560,
+        848
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kSI1n2YDiz5pXHX5",
+          "name": "Som Google Sheet Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.reply }}",
+        "options": {}
+      },
+      "id": "b082904a-6047-43ef-9819-1f64f6e5bfc2",
+      "name": "Reply: not found",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        16,
+        640
+      ],
+      "webhookId": "d3915e3a-2e77-4a95-b911-ee82b4daddce"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cb9e4308-7dc4-41d2-92d5-7649e168d778",
+              "name": "final_memo",
+              "value": "={{ $json.memo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7efc5ac9-e6b2-42ed-a4be-84774bfb47a5",
+      "name": "Final memo (approved)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2064,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9973abce-79b1-40ce-9afb-813c8460f59c",
+              "name": "final_memo",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "284f5e3b-3f08-4217-b172-5a5ae32c16b9",
+      "name": "Final memo (rewritten)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2224,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write the memo from this data: {{ JSON.stringify($json) }}",
+        "options": {
+          "systemMessage": "You write the readiness memo. The verdict, rule table, broken rules and conditions\nare already decided by code. Do NOT change, recompute or add any of them.\n\nFormat:\nLine 1: <name> - <verdict>\nReasons: the rows as a table (rule | limit | actual | status)\nIf verdict is GO WITH CONDITIONS: \"Conditions\" listing each item in conditions.\nIf verdict is NO-GO: \"What must change\" listing each item in broken.\nPlain wording only. Use only the data given."
+        }
+      },
+      "id": "8c08e3e9-6d5d-42a4-9ec9-0c53a8524eb5",
+      "name": "Memo Writer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1104,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "e64812bc-e880-4490-88c5-ef80a77d4b18",
+      "name": "OpenRouter Chat Model4",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        544
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=MEMO:\n{{ $json.output }}\n\nFINDINGS (decided by code from the sheet data):\nFINDINGS (authoritative):\nRelease: {{ $('Judge and combine').first().json.name }}\nVerdict: {{ $('Judge and combine').first().json.verdict }}\nRows: {{ JSON.stringify($('Judge and combine').first().json.rows) }}\nConditions: {{ JSON.stringify($('Judge and combine').first().json.conditions) }}\nBroken: {{ JSON.stringify($('Judge and combine').first().json.broken) }}",
+        "options": {
+          "systemMessage": "You are the Reviewer. Compare the MEMO with the FINDINGS and the POLICY above.\nThe FINDINGS verdict, rows and conditions are correct by definition. Do not re-judge them.\n\nCheck only these, and report a problem ONLY if the memo differs:\n1. Line 1 has the release name and the same verdict as FINDINGS.\n2. Every row in FINDINGS.rows appears in the memo, with the same limit, actual and status.\n3. Every item in FINDINGS.conditions (GO WITH CONDITIONS) or FINDINGS.broken (NO-GO) appears in the memo.\n4. The memo contains no number, status or team that is not in FINDINGS.\n\nEach issue must read: \"Memo says X, FINDINGS say Y\".\nNever list something that is correct. If nothing differs, issues must be [].\n\nReply with ONLY this JSON:\n{\"approved\": true, \"issues\": []}\nor {\"approved\": false, \"issues\": [\"...\"]}\n\nCompare ONLY the release name, verdict, rows, and the conditions/broken lists above.\nDo not mention bug statuses, dependencies that are not listed as conditions, or any item not shown above.\nText that is identical on both sides is never an issue."
+        }
+      },
+      "id": "c41945a9-508e-467d-8b85-e210bc242139",
+      "name": "Reviewer",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1392,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "9c7de49d-db5e-45ee-bac2-6491b7ae2130",
+      "name": "OpenRouter Chat Model5",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        544
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Rewrite the memo from this data: {{ JSON.stringify($('Judge and combine').first().json) }}\n\nYour previous memo had these problems. Fix them:\n{{ $json.issues.join('\\n') }}\n\nPREVIOUS MEMO:\n{{ $json.memo }}",
+        "options": {
+          "systemMessage": "You write the readiness memo. The verdict, rule table, broken rules and conditions\nare already decided by code. Do NOT change, recompute or add any of them.\n\nFormat:\nLine 1: <name> - <verdict>\nReasons: the rows as a table (rule | limit | actual | status)\nIf verdict is GO WITH CONDITIONS: \"Conditions\" listing each item in conditions.\nIf verdict is NO-GO: \"What must change\" listing each item in broken.\nPlain wording only. Use only the data given."
+        }
+      },
+      "id": "7673f7cc-bf5a-4527-9167-181ef0daf11d",
+      "name": "Memo Writer (rewrite)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1968,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "81410c4b-1537-4220-b5f6-dccdb1ea9a32",
+      "name": "OpenRouter Chat Model6",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        608
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54d228cc-9c93-4419-9a7e-b9af39a3ffe5",
+              "name": "reply",
+              "value": "=Announcement sent (simulated): {{ $('Final memo').first().json.final_memo }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "67bbaeaf-6bef-44dd-8cf8-e270beab2338",
+      "name": "Announcement",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2912,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.reply }}",
+        "options": {}
+      },
+      "id": "3c23217c-af69-422c-b413-ff4e19bcd626",
+      "name": "Reply: announcement",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        3136,
+        224
+      ],
+      "webhookId": "6fc6615e-8da4-41c3-a147-07e0b84ca2dc"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1ce618c-3da0-405e-939e-fb633e3e02dc",
+              "name": "reply",
+              "value": "Not approved. Nothing was sent.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "48a455e1-cb2c-471b-b767-e4973f243ff1",
+      "name": "Stopped",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2912,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.reply }}",
+        "options": {}
+      },
+      "id": "5f0ee943-055a-4834-8366-8a8742ac6251",
+      "name": "Reply: stopped",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        3120,
+        448
+      ],
+      "webhookId": "d1ce0e38-f354-477a-8ca6-b608b008c337"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are the intake agent for a Release Readiness Desk.\nThe user asks about a release, either by name (e.g. \"Checkout 4.2\") or by ID (e.g. \"R-402\").\n\nUse the Google Sheets tool to read the releases list, then find the matching release.\nNever guess. Only use what is in the sheet.\n\nReply with ONLY this JSON, and nothing else:\n{\"found\": true, \"release_id\": \"...\", \"name\": \"...\", \"type\": \"...\"}\n\nIf no release matches, reply with ONLY:\n{\"found\": false, \"release_id\": null, \"name\": null, \"type\": null, \"message\": \"No release matching '<what the user typed>' exists.\"}"
+        }
+      },
+      "id": "11052dd7-10b2-44d8-9e1c-552211a4d87e",
+      "name": "Intake Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -608,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "id": "9c6f9ca8-ff46-4e0d-98d2-b7c58acd84d1",
+      "name": "Intake Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        192
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "hhBfg5sFBaYYPQ2d",
+          "name": "Som OpenRouter Acc"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output;\n// Remove any ```json fences, in case the model adds them\nconst cleaned = raw.replace(/```json|```/g, '').trim();\nconst data = JSON.parse(cleaned);\nreturn [{ json: data }];"
+      },
+      "id": "2e3b40c5-3fd7-48d3-8337-dad946307366",
+      "name": "Parse Intake",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "95942ac5-f877-479c-b926-031a65693f9a",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1e1f0a94-5648-4806-a2b4-1d89b008b078",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "810288e4-4faf-41cf-a654-605e80a3c82f",
+      "name": "Release Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        -112,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "hotfix",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1e283778-3ad7-4c68-9d87-3155bee48de4"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "76857466-df24-40bd-ad06-50d0e427d482",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "minor",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 4
+                },
+                "conditions": [
+                  {
+                    "id": "9e77f953-072b-44c0-be7b-8b11f1a6f4cf",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "major",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4fa216dc-14b9-489f-8813-1e101954f600",
+      "name": "Route by type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.5,
+      "position": [
+        112,
+        -32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ff2d0a7-a3c5-43d8-8aab-e6e9e30ac2ed",
+              "name": "reply",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            },
+            {
+              "id": "5f27cf86-634a-4c57-be3d-b5c906f2bc20",
+              "name": "message",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4d4fb72-73d4-411b-aee9-994acf377ccb",
+      "name": "Set not-found reply",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -112,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Tests Checker for a MAJOR release.\nUse the Google Sheets tool to read the test_results rows for the given release_id.\nUse only rows for that release. Never guess.\n\nPolicy for a major release: pass rate at least 98%, and at least 400 tests run in total.\nPass rate = total tests passed / total tests run, across ALL areas\n(not an average of the per-area percentages). Round to 1 decimal.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\", \"areas\": [{\"area\": \"...\", \"run\": 0, \"passed\": 0}],\n \"total_run\": 0, \"total_passed\": 0, \"pass_rate_percent\": 0.0,\n \"pass_rate_rule_met\": true, \"min_tests_rule_met\": true,\n \"summary\": \"one sentence\"}"
+        }
+      },
+      "id": "c4a24ae5-619a-4118-89a9-abef8f400b31",
+      "name": "Test Checker (major)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        336
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Bugs Checker for a MAJOR release.\nUse the Google Sheets tool to read the open_bugs rows for the given release_id.\nUse only rows for that release. Never guess.\n\nA bug is OPEN only if its status is exactly \"Open\" or \"In progress\".\n\"Closed\" and \"Fixed-verified\" do NOT count.\n\nPolicy for a major release: open Critical bugs at most 0, open High bugs at most 2.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\",\n \"open_bugs\": [{\"bug_id\": \"...\", \"severity\": \"...\", \"status\": \"...\", \"owner\": \"...\"}],\n \"open_critical\": 0, \"open_high\": 0,\n \"critical_rule_met\": true, \"high_rule_met\": true,\n \"summary\": \"one sentence\"}\n\nList ALL open bugs of ANY severity (Critical, High, Medium, Low). Never omit one."
+        }
+      },
+      "id": "7d5275f2-d589-4b86-a337-4ce67625b7cd",
+      "name": "Bug Checker (major)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Release: {{ $json.name }} (ID: {{ $json.release_id }}), type: {{ $json.type }}. Check its test results.",
+        "options": {
+          "systemMessage": "You are the Dependencies Checker for a MAJOR release.\nUse the Google Sheets tool to read the dependencies rows for the given release_id.\nUse only rows for that release. Never guess.\n\nPolicy for a major release: a \"Blocked\" dependency is not allowed (breaks the rules).\nAn \"At risk\" dependency is allowed but becomes a condition.\n\"Done\" is fine.\n\nReply with ONLY this JSON:\n{\"release_id\": \"...\",\n \"dependencies\": [{\"dep_id\": \"...\", \"team\": \"...\", \"status\": \"...\", \"due_date\": \"...\"}],\n \"blocked_count\": 0, \"at_risk_count\": 0,\n \"blocked_rule_met\": true,\n \"summary\": \"one sentence\"}"
+        }
+      },
+      "id": "397c7796-320b-412c-8fd8-3788fbe236cd",
+      "name": "Dependency Checker (major)",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        384,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "id": "d4266f0d-dd4c-41aa-a804-7b7926bb429f",
+      "name": "Collect findings",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => JSON.parse(i.json.output.replace(/```json|```/g, '').trim()));\n\n// Identify each result by the fields it contains, not by its position\nconst tests = items.find(x => 'total_run' in x);\nconst bugs  = items.find(x => 'open_bugs' in x);\nconst deps  = items.find(x => 'dependencies' in x);\n\n// Release name and type come from the earlier Code node\nconst rel = $('Parse Intake').first().json;\n\n// Recompute the arithmetic in code, so we don't trust the model\nconst total_run = tests.areas.reduce((s, a) => s + a.run, 0);\nconst total_passed = tests.areas.reduce((s, a) => s + a.passed, 0);\nconst pass_rate = Math.round((total_passed / total_run) * 1000) / 10;\n\nconst POLICY = {\n  hotfix: { pass: 95, minRun: null, crit: 0, high: 0, blocked: false, atRisk: false },\n  minor:  { pass: 97, minRun: null, crit: 0, high: 2, blocked: true,  atRisk: true  },\n  major:  { pass: 98, minRun: 400,  crit: 0, high: 2, blocked: true,  atRisk: true  }\n};\nconst p = POLICY[rel.type];\n\nconst openBugs = (bugs?.open_bugs ?? []).filter(b => ['Open', 'In progress'].includes(b.status));\nconst openCrit = openBugs.filter(b => b.severity === 'Critical');\nconst openHigh = openBugs.filter(b => b.severity === 'High');\nconst depList = deps?.dependencies ?? [];\nconst blocked = depList.filter(d => d.status === 'Blocked');\nconst atRisk = depList.filter(d => d.status === 'At risk');\n\nconst rows = [];\nrows.push({ rule: 'Test pass rate', limit: `at least ${p.pass}%`, actual: `${pass_rate}%`, status: pass_rate >= p.pass ? 'MET' : 'BROKEN' });\nrows.push(p.minRun\n  ? { rule: 'Tests run in total', limit: `at least ${p.minRun}`, actual: `${total_run}`, status: total_run >= p.minRun ? 'MET' : 'BROKEN' }\n  : { rule: 'Tests run in total', limit: 'none', actual: `${total_run}`, status: 'MET' });\nrows.push({ rule: 'Open Critical bugs', limit: `at most ${p.crit}`, actual: `${openCrit.length}`, status: openCrit.length <= p.crit ? 'MET' : 'BROKEN' });\nrows.push({ rule: 'Open High bugs', limit: `at most ${p.high}`, actual: `${openHigh.length}`, status: openHigh.length <= p.high ? 'MET' : 'BROKEN' });\nrows.push(p.blocked\n  ? { rule: 'Blocked dependencies', limit: 'not allowed (0)', actual: `${blocked.length}`, status: blocked.length === 0 ? 'MET' : 'BROKEN' }\n  : { rule: 'Blocked dependencies', limit: 'not checked', actual: 'n/a', status: 'N/A' });\n\nconst broken = rows.filter(r => r.status === 'BROKEN');\nconst conditions = [\n  ...openHigh.map(b => `Open High bug ${b.bug_id} - owner ${b.owner}`),\n  ...(p.atRisk ? atRisk.map(d => `At risk dependency ${d.dep_id} - ${d.team}`) : [])\n];\n\nlet verdict = 'GO';\nif (broken.length > 0) verdict = 'NO-GO';\nelse if (conditions.length > 0) verdict = 'GO WITH CONDITIONS';\n\nreturn [{ json: {\n  release_id: rel.release_id, name: rel.name, type: rel.type,\n  verdict, rows,\n  broken: broken.map(r => `${r.rule}: ${r.actual} (limit: ${r.limit})`),\n  conditions: verdict === 'GO WITH CONDITIONS' ? conditions : [],\n  open_bugs: openBugs, dependencies: depList\n}}];"
+      },
+      "id": "b510818f-535d-4cb1-a247-1aeef6e0cd62",
+      "name": "Judge and combine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.output;\nconst r = JSON.parse(raw.replace(/```json|```/g, '').trim());\nreturn [{ json: { approved: r.approved, issues: r.issues || [], memo: $('Memo Writer').first().json.output } }];"
+      },
+      "id": "eb5e91ad-1cd6-480a-8ded-3ecf5ae30e5a",
+      "name": "Parse review",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "7feb7257-8800-404d-9c66-ee6a2feddf7a",
+              "leftValue": "={{ $json.approved }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "046a20cd-5fab-4de7-89f6-43dd41982dd8",
+      "name": "Memo approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        1840,
+        368
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "15528602-7ae9-4232-8d37-2bbbb17cb4cf",
+      "name": "Final memo",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2368,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "message": "=     {{ $json.final_memo }}\n\n     Do you approve this memo for announcement? Type yes or no.",
+        "options": {}
+      },
+      "id": "ea18f85c-96b2-4c64-9552-8ab7b6cf4507",
+      "name": "Ask human approval",
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.3,
+      "position": [
+        2528,
+        352
+      ],
+      "webhookId": "9ffd5138-19b4-4878-8c0f-ea2aabbde458"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "ec07604f-03f7-4a0b-aec1-9158c7d976b6",
+              "leftValue": "={{ String($json.data ?? $json.text ?? $json.chatInput).trim().toLowerCase() }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "3bea84b5-79b1-4ae1-ac75-e911366bc590",
+      "name": "Human said yes?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        2688,
+        352
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Intake Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Releases sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Intake Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Checker (hotfix)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model10": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Test Checker (hotfix)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Result Sheet2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Test Checker (hotfix)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bug Checker (hotfix)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model11": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Bug Checker (hotfix)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Bugs Sheet2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Bug Checker (hotfix)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Checker (minor)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model7": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Test Checker (minor)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Result Sheet1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Test Checker (minor)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bug Checker (minor)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model8": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Bug Checker (minor)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Bugs Sheet1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Bug Checker (minor)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dependency Checker (minor)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model9": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Dependency Checker (minor)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dependencies Sheet1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Dependency Checker (minor)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Test Checker (major)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Result Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Test Checker (major)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Bug Checker (major)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Bugs Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Bug Checker (major)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Dependency Checker (major)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dependencies Sheet": {
+      "ai_tool": [
+        [
+          {
+            "node": "Dependency Checker (major)",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final memo (approved)": {
+      "main": [
+        [
+          {
+            "node": "Final memo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final memo (rewritten)": {
+      "main": [
+        [
+          {
+            "node": "Final memo",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Memo Writer": {
+      "main": [
+        [
+          {
+            "node": "Reviewer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Memo Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reviewer": {
+      "main": [
+        [
+          {
+            "node": "Parse review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Reviewer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memo Writer (rewrite)": {
+      "main": [
+        [
+          {
+            "node": "Final memo (rewritten)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model6": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Memo Writer (rewrite)",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Announcement": {
+      "main": [
+        [
+          {
+            "node": "Reply: announcement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Stopped": {
+      "main": [
+        [
+          {
+            "node": "Reply: stopped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse Intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Intake Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Intake": {
+      "main": [
+        [
+          {
+            "node": "Release Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Release Found?": {
+      "main": [
+        [
+          {
+            "node": "Route by type",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set not-found reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by type": {
+      "main": [
+        [
+          {
+            "node": "Test Checker (hotfix)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bug Checker (hotfix)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Test Checker (minor)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bug Checker (minor)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Dependency Checker (minor)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Test Checker (major)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bug Checker (major)",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Dependency Checker (major)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set not-found reply": {
+      "main": [
+        [
+          {
+            "node": "Reply: not found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Test Checker (major)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bug Checker (major)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Dependency Checker (major)": {
+      "main": [
+        [
+          {
+            "node": "Collect findings",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Collect findings": {
+      "main": [
+        [
+          {
+            "node": "Judge and combine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Judge and combine": {
+      "main": [
+        [
+          {
+            "node": "Memo Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse review": {
+      "main": [
+        [
+          {
+            "node": "Memo approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memo approved?": {
+      "main": [
+        [
+          {
+            "node": "Final memo (approved)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Memo Writer (rewrite)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final memo": {
+      "main": [
+        [
+          {
+            "node": "Ask human approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ask human approval": {
+      "main": [
+        [
+          {
+            "node": "Human said yes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Human said yes?": {
+      "main": [
+        [
+          {
+            "node": "Announcement",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stopped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7efcec9e-aeec-473e-b24a-5e933fc4c7d9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "55f05c06ad1cfec369b1ee5e23826261e170e4ff502372d530dcb14dea4ef6eb"
+  },
+  "nodeGroups": [],
+  "id": "HFMvkg93ZO7ryEzu",
+  "tags": []
+}

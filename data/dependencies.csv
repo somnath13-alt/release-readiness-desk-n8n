@@ -1,0 +1,10 @@
+dep_id,release_id,depends_on_team,description,status,due_date
+D-01,R-401,Fraud team,New risk-check API,Blocked,2026-11-03
+D-02,R-401,Platform team,Shared payment library update,Done,2026-10-28
+D-03,R-402,Identity team,Token refresh fix,At risk,2026-10-28
+D-04,R-403,Data team,Search index migration,At risk,2026-11-02
+D-05,R-404,Infra team,New production cluster,Done,2026-11-05
+D-06,R-405,Tax service team,Updated tax rates,Done,2026-10-30
+D-07,R-406,Messaging team,Email digest template,Done,2026-10-28
+D-08,R-407,Data warehouse team,New reporting tables,At risk,2026-11-07
+D-09,R-407,Design system team,New chart components,Done,2026-10-30

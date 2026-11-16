@@ -1,0 +1,9 @@
+release_id,name,type,planned_date,summary
+R-401,Checkout 4.2,major,2026-11-06,New checkout flow with promo codes and a new fraud check.
+R-402,Mobile App 3.1.1,hotfix,2026-10-29,Fixes a startup crash on older Android phones.
+R-403,Search 2.8,minor,2026-11-03,Faster search and better ranking.
+R-404,Platform 5.0,major,2026-11-12,New core platform and public API.
+R-405,Billing 3.4,minor,2026-11-04,Refund and invoice improvements.
+R-406,Notifications 1.9,minor,2026-11-02,Notification preferences and email digest.
+R-407,Reports 4.0,major,2026-11-10,Redesigned reports with new charts and export.
+R-408,Login 2.3.1,hotfix,2026-10-30,Fixes sign-in with single sign-on.
