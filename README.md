@@ -103,4 +103,5 @@ Approval step: answering `yes` sends the simulated announcement; `no` (or anythi
 
 ## Licence
 
-Add a licence of your choice (for example MIT). Course datasets and the release policy belong to the course.
+Code and workflow: MIT (see [LICENSE](LICENSE)).
+Course datasets and the release policy belong to the course and are included for learning and testing purposes.
